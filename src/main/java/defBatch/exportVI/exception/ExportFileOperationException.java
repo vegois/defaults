@@ -1,4 +1,4 @@
-package defBatch.export.exception;
+package defBatch.exportVI.exception;
 
 public class ExportFileOperationException extends Exception {
     private static final long serialVersionUID = 1L;

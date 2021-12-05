@@ -1,4 +1,4 @@
-package defBatch.export.record;
+package defBatch.exportVI.record;
 
 
 import java.util.List;

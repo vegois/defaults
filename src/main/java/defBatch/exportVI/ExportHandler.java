@@ -1,7 +1,7 @@
-package defBatch.export;
+package defBatch.exportVI;
 
 
-import defBatch.export.exception.ExportFileOperationException;
+import defBatch.exportVI.exception.ExportFileOperationException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 

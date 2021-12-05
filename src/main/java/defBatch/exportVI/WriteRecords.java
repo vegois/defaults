@@ -1,7 +1,7 @@
-package defBatch.export;
+package defBatch.exportVI;
 
-import defBatch.export.record.Record;
-import defBatch.export.record.RecordFormatter;
+import defBatch.exportVI.record.Record;
+import defBatch.exportVI.record.RecordFormatter;
 import org.springframework.util.ReflectionUtils;
 
 import java.util.List;

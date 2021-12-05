@@ -1,19 +1,15 @@
 package defBatch;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import defBatch.export.ExportHandler;
-import defBatch.export.WriteRecords;
-import defBatch.export.exception.ExportFileOperationException;
-import defBatch.export.record.RecordFormatter;
-import defBatch.provider.json.CsvToJsonTest;
+import defBatch.exportVI.ExportHandler;
+import defBatch.exportVI.WriteRecords;
+import defBatch.exportVI.exception.ExportFileOperationException;
+import defBatch.exportVI.record.RecordFormatter;
+import defBatch.provider.json.TextToJson;
 import defBatch.util.Student;
 
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class TestExport {
@@ -39,13 +35,30 @@ public class TestExport {
         } catch (ExportFileOperationException e) {
             e.printStackTrace();
         }
-        CsvToJsonTest csvToJsonTest = new CsvToJsonTest();
+        TextToJson textToJson = new TextToJson();
 
         List<String> fields = Arrays.stream(Student.class.getDeclaredFields()).map(Field::getName).collect(Collectors.toList());
+        List<String> boolFields = getBooleanFields(Student.class);
 
 
-        List<Map<String, String>> mapcsv = csvToJsonTest.csvToJson("file.CSV", fields, "|");
-        List<Student> mapcsvObj = csvToJsonTest.csvToObj("file.CSV","|", Student.class);
+        List<Map<String, String>> mapcsv = textToJson.csvToJson("file.CSV", fields, "|");
+        List<Student> mapcsvObj = textToJson.csvToObj("file.CSV","|", Student.class);
 
+
+
+        Set<Student> studentList1 = textToJson.convertListToObj(mapcsv, textToJson.getNeededClassFieldTypes(Student.class, Boolean.class),"X","null",Student.class);
+
+        studentList1.forEach(
+                student -> System.out.println(student.toString())
+        );
     }
+
+    private static List<String> getBooleanFields(Class<?> className){
+
+        return Arrays.stream(className.getDeclaredFields())
+                .filter(type-> type.getType() == Boolean.class)
+                .map(Field::getName)
+                .collect(Collectors.toList());
+    }
+
 }

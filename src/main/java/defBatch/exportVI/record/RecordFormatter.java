@@ -1,4 +1,4 @@
-package defBatch.export.record;
+package defBatch.exportVI.record;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;

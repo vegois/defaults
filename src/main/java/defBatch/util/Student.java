@@ -1,5 +1,15 @@
 package defBatch.util;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.joda.JodaModule;
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.JsonParser;
+import org.codehaus.jackson.ObjectCodec;
+import org.codehaus.jackson.map.DeserializationContext;
+import org.codehaus.jackson.map.JsonDeserializer;
+import org.codehaus.jackson.map.deser.std.StdDeserializer;
+
+import java.io.IOException;
 import java.math.BigDecimal;
 
 public class Student {
@@ -46,6 +56,7 @@ public class Student {
         this.male = male;
     }
 
+
     public BigDecimal getMoney() {
         return money;
     }
@@ -60,5 +71,16 @@ public class Student {
 
     public void setRate(double rate) {
         this.rate = rate;
+    }
+
+    @Override
+    public String toString() {
+        return "Student{" +
+                "name='" + name + '\'' +
+                ", age=" + age +
+                ", male=" + male +
+                ", money=" + money +
+                ", rate=" + rate +
+                '}';
     }
 }
