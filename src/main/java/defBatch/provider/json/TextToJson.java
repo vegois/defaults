@@ -4,6 +4,7 @@ import java.io.*;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
@@ -12,7 +13,7 @@ public class TextToJson {
 
 
     public List<Map<String, String>> csvToJson(String csvFileName, List<String> fieldNames, String DELIMITER ){
-        List<Map<String,String>> list = new ArrayList<>();
+        Set<Map<String,String>> list = new HashSet<>();
 
         try (InputStream in = new FileInputStream(csvFileName)) {
             BufferedReader reader = new BufferedReader(new InputStreamReader(in));
@@ -23,10 +24,8 @@ public class TextToJson {
                     line = StringUtils.removeEnd(line,DELIMITER);
                 }
                 List<String> x = Arrays.stream(StringUtils.splitPreserveAllTokens(line, DELIMITER)).collect(Collectors.toList());
-                Map<String,String> obj = new LinkedHashMap <> ();
-                for (int i = 0; i < fieldNames.size(); i++) {
-                    obj.put(fieldNames.get(i), x.get(i).isEmpty() ? "null" : x.get(i));
-                }
+                Map<String,String> obj = IntStream.range(0, fieldNames.size()).boxed().collect(
+                        Collectors.toMap(fieldNames::get, i -> x.get(i).isEmpty() ? "null" :x.get(i), (a, b) -> b, LinkedHashMap::new));
 
                 list.add(obj);
             }
@@ -35,7 +34,7 @@ public class TextToJson {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return list;
+        return new ArrayList<>(list);
     }
 
     public <T> List<T> csvToObj(String csvFileName, String DELIMITER, Class<T> className) {
@@ -54,16 +53,16 @@ public class TextToJson {
                 }
                 List<String> x = Arrays.stream(StringUtils.splitPreserveAllTokens(line, DELIMITER)).collect(Collectors.toList());
                 Map<String,String> obj = new LinkedHashMap <> ();
-                for (int i = 0; i < fieldNames.size(); i++) {
-                    if (boolValues.contains(fieldNames.get(i)) ){
+                IntStream.range(0, fieldNames.size()).forEach(i -> {
+                    if (boolValues.contains(fieldNames.get(i))) {
                         if (x.get(i).equals("X")) x.set(i, "true");
-                        else x.set(i,"false");
+                        else x.set(i, "false");
                     }
-                    if (stringValues.contains(fieldNames.get(i))){
-                        if (x.get(i).equals("null")) x.set(i,"");
+                    if (stringValues.contains(fieldNames.get(i))) {
+                        if (x.get(i).equals("null")) x.set(i, "");
                     }
                     obj.put(fieldNames.get(i), x.get(i));
-                }
+                });
                 final ObjectMapper mapper = new ObjectMapper(); // jackson's objectmapper
                 list.add(mapper.convertValue( obj, className));
             }
@@ -84,16 +83,16 @@ public class TextToJson {
     }
 
     public List<Map<String, String>> correctBooleanValues(List<Map<String, String>> list, List<String> booleanFields, String trueValue, String falseValue){
-        for (Map<String, String> map : list) {
-            for (String f: booleanFields) {
+        list.forEach(map -> {
+            booleanFields.forEach(f -> {
                 if (map.get(f).equals(trueValue)) {
                     map.put(f,"true");
                 }
                 else if (map.get(f).equals(falseValue)){
                     map.put(f,"false");
                 }
-            }
-        }
+            });
+        });
         return list;
     }
     public <T> T convertObj(Map<String, String> map, Class<T> className){
@@ -103,17 +102,33 @@ public class TextToJson {
 
     public <T> Set<T> convertListToObj(List<Map<String, String>> list, List<String> booleanFields, String trueValue, String falseValue, Class<T> className ){
         Set<T> objList = new HashSet<>();
-        for (Map<String, String> map : list) {
-            for (String f: booleanFields) {
+        list.forEach(map -> {
+            booleanFields.forEach(f -> {
                 if (map.get(f).equals(trueValue)) {
                     map.put(f,"true");
                 }
                 else if (map.get(f).equals(falseValue)){
                     map.put(f,"false");
                 }
-            }
+            });
             objList.add(convertObj(map,className));
-        }
+        });
+        return objList;
+    }
+
+    public <T> Set<T> convertListToObj(List<Map<String, String>> list, List<String> booleanFields , Class<T> className ){
+        Set<T> objList = new HashSet<>();
+        list.forEach(map -> {
+            booleanFields.forEach(f -> {
+                if (map.get(f).equals("X")) {
+                    map.put(f,"true");
+                }
+                else if (map.get(f).equals("null")){
+                    map.put(f,"false");
+                }
+            });
+            objList.add(convertObj(map,className));
+        });
         return objList;
     }
 

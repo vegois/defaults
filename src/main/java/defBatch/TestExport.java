@@ -20,7 +20,7 @@ public class TestExport {
         WriteRecords writeRecords = new WriteRecords();
 
         Student vegim = new Student("Vegim", null, true, BigDecimal.TEN, 22.22);
-        Student mereme = new Student("Mereme", 19, false, BigDecimal.TEN, 22.23);
+        Student mereme = new Student("Mereme", 19, null, null, 22.23);
 
 
 
